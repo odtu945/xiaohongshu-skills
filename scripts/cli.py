@@ -424,6 +424,22 @@ def cmd_get_feed_detail(args: argparse.Namespace) -> None:
         browser.close()
 
 
+def cmd_save_feed(args: argparse.Namespace) -> None:
+    """将小红书笔记保存为 Markdown（含图片下载）。"""
+    from xhs.save import save_feed_as_markdown
+
+    browser, page = _connect(args)
+    try:
+        result = save_feed_as_markdown(
+            page,
+            url=args.url,
+            output_dir=args.output_dir,
+        )
+        _output(result)
+    finally:
+        browser.close()
+
+
 def cmd_user_profile(args: argparse.Namespace) -> None:
     """获取用户主页。"""
     from xhs.user_profile import get_user_profile
@@ -774,6 +790,12 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_argument("--max-comment-items", type=int, default=0)
     sub.add_argument("--scroll-speed", default="normal", help="slow|normal|fast")
     sub.set_defaults(func=cmd_get_feed_detail)
+
+    # save-feed
+    sub = subparsers.add_parser("save-feed", help="将笔记保存为 Markdown（含图片下载）")
+    sub.add_argument("--url", required=True, help="小红书分享链接")
+    sub.add_argument("--output-dir", default=None, help="输出目录（默认当前目录）")
+    sub.set_defaults(func=cmd_save_feed)
 
     # user-profile
     sub = subparsers.add_parser("user-profile", help="获取用户主页")

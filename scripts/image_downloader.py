@@ -59,10 +59,9 @@ class ImageDownloader:
             return existing
 
         # 下载
-        parsed = urlparse(image_url)
         headers = {
             "User-Agent": _USER_AGENT,
-            "Referer": f"{parsed.scheme}://{parsed.hostname}/",
+            "Referer": "https://www.xiaohongshu.com/",
         }
 
         resp = self._session.get(image_url, headers=headers)

@@ -41,6 +41,7 @@ metadata:
 3. **搜索发现**（"搜索笔记 / 查看详情 / 浏览首页 / 查看用户"）→ 执行 `xhs-explore` 技能。
 4. **社交互动**（"评论 / 回复 / 点赞 / 收藏"）→ 执行 `xhs-interact` 技能。
 5. **复合运营**（"竞品分析 / 热点追踪 / 批量互动 / 一键创作"）→ 执行 `xhs-content-ops` 技能。
+6. **内容保存**（"保存笔记 / 导出 markdown / 下载内容 / 转 markdown"）→ 执行 `xhs-save` 技能。
 
 ## 全局约束
 
@@ -100,6 +101,14 @@ metadata:
 
 组合多步骤完成运营工作流：竞品分析、热点追踪、内容创作、互动管理。
 
+### xhs-save — 内容保存
+
+将笔记转换为 Markdown 文件并下载所有图片素材。
+
+| 命令 | 功能 |
+|------|------|
+| `cli.py save-feed` | 保存笔记为 Markdown（含图片下载） |
+
 ## 快速开始
 
 ```bash
@@ -134,6 +143,10 @@ python scripts/cli.py post-comment \
 # 8. 点赞
 python scripts/cli.py like-feed \
   --feed-id FEED_ID --xsec-token XSEC_TOKEN
+
+# 9. 保存笔记为 Markdown
+python scripts/cli.py save-feed \
+  --url "https://www.xiaohongshu.com/discovery/item/69f3fd..."
 ```
 
 ## 失败处理
