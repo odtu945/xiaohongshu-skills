@@ -171,6 +171,66 @@ class Feed:
 
 
 @dataclass
+class VideoStream:
+    """视频流信息。"""
+    master_url: str = ""
+    backup_urls: list[str] = field(default_factory=list)
+    quality_type: str = ""
+    format: str = ""
+    width: int = 0
+    height: int = 0
+    duration: int = 0
+    size: int = 0
+    video_codec: str = ""
+
+    @classmethod
+    def from_dict(cls, d: dict) -> VideoStream:
+        return cls(
+            master_url=d.get("masterUrl", ""),
+            backup_urls=d.get("backupUrls", []) or [],
+            quality_type=d.get("qualityType", ""),
+            format=d.get("format", ""),
+            width=d.get("width", 0),
+            height=d.get("height", 0),
+            duration=d.get("duration", 0),
+            size=d.get("size", 0),
+            video_codec=d.get("videoCodec", ""),
+        )
+
+
+@dataclass
+class VideoInfo:
+    """视频详情。"""
+    streams: list[VideoStream] = field(default_factory=list)
+    duration: int = 0
+
+    @classmethod
+    def from_dict(cls, d: dict) -> VideoInfo:
+        video_data = d.get("media", {})
+        stream = video_data.get("stream", {})
+        streams: list[VideoStream] = []
+        for codec in ["h264", "h265", "h266", "av1"]:
+            for s in stream.get(codec, []) or []:
+                streams.append(VideoStream.from_dict(s))
+        biz = video_data.get("video", {})
+        return cls(
+            streams=streams,
+            duration=biz.get("duration", 0),
+        )
+
+    @property
+    def best_url(self) -> str:
+        """获取最佳视频 URL（优先 h264，否则第一个可用流）。"""
+        for s in self.streams:
+            if s.video_codec == "h264" and s.master_url:
+                return s.master_url
+        for s in self.streams:
+            if s.master_url:
+                return s.master_url
+        return ""
+
+
+@dataclass
 class DetailImageInfo:
     width: int = 0
     height: int = 0
@@ -264,9 +324,11 @@ class FeedDetail:
     user: User = field(default_factory=User)
     interact_info: InteractInfo = field(default_factory=InteractInfo)
     image_list: list[DetailImageInfo] = field(default_factory=list)
+    video: VideoInfo | None = None
 
     @classmethod
     def from_dict(cls, d: dict) -> FeedDetail:
+        video_data = d.get("video")
         return cls(
             note_id=d.get("noteId", ""),
             xsec_token=d.get("xsecToken", ""),
@@ -278,6 +340,7 @@ class FeedDetail:
             user=User.from_dict(d.get("user", {})),
             interact_info=InteractInfo.from_dict(d.get("interactInfo", {})),
             image_list=[DetailImageInfo.from_dict(i) for i in d.get("imageList", []) or []],
+            video=VideoInfo.from_dict(video_data) if video_data else None,
         )
 
     def to_dict(self) -> dict:
@@ -308,6 +371,23 @@ class FeedDetail:
                 }
                 for img in self.image_list
             ],
+            "video": {
+                "url": self.video.best_url,
+                "duration": self.video.duration,
+                "streams": [
+                    {
+                        "url": s.master_url,
+                        "quality": s.quality_type,
+                        "codec": s.video_codec,
+                        "width": s.width,
+                        "height": s.height,
+                        "size": s.size,
+                    }
+                    for s in self.video.streams
+                ],
+            }
+            if self.video
+            else None,
         }
 
 
