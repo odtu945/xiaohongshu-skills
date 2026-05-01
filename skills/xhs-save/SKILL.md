@@ -14,6 +14,7 @@ metadata:
     os:
       - darwin
       - linux
+      - windows
 ---
 
 # 小红书笔记保存为 Markdown
@@ -41,11 +42,11 @@ python scripts/cli.py save-feed --url "分享链接" [--output-dir /path/to/outp
 
 该命令会自动完成：
 1. 从 URL 中解析 feed_id 和 xsec_token
-2. 打开笔记详情页，获取正文、图片列表和评论
+2. 打开笔记详情页，获取正文、图片、视频列表和评论
 3. 创建用户友好的输出目录（基于笔记标题，去除 emoji 和特殊字符）
-4. 下载所有图片到输出目录
-5. 生成 Markdown 文件，包含：标题、正文、图片素材、话题标签、评论
-6. 输出 JSON 结果：`markdown_path`、`image_count`、`output_dir`
+4. 下载所有图片到输出目录，如有视频一并下载
+5. 生成 Markdown 文件，包含：标题、正文、图片、视频、话题标签、评论
+6. 输出 JSON 结果：`markdown_path`、`image_count`、`video_file`、`output_dir`
 
 ### Markdown 输出格式
 

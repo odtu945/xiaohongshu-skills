@@ -246,8 +246,6 @@ def save_feed_as_markdown(
     video_filename = ""
     if note.video and note.video.best_url:
         video_url = note.video.best_url
-        if video_url.startswith("http://"):
-            video_url = "https://" + video_url[7:]
         try:
             import requests as _requests
             parsed_video = urlparse(video_url)
